@@ -1,31 +1,54 @@
-import Ajv, { JSONSchemaType } from 'ajv';
+import Ajv, { JSONSchemaType, FuncKeywordDefinition } from 'ajv';
 import addFormats from 'ajv-formats';
+import addKeywords from 'ajv-keywords';
 
-const createConfig = <T>(props: ConfigProperties<T>, ajv?: Ajv) => {
-  const { schema, input } = Object.assign({}, props)
+const splitter: FuncKeywordDefinition = {
+  keyword: 'splitter',
+  type: 'string',
+  modifying: true,
+  valid: true,
+  errors: false,
+  // @ts-ignore
+  compile: (schema) => (data, dataPath, parentData, parentDataProperty) => {
+    if (parentData && parentDataProperty) {
+      parentData[parentDataProperty] = data === '' ? [] : data.split(schema);
+    } else {
+      const { parentData: pData, parentDataProperty: pDataProperty } = dataPath;
+      pData[pDataProperty] = data === '' ? [] : data.split(schema);
+    }
+  },
+};
+
+let ajvInstance = new Ajv({
+  coerceTypes: true,
+  useDefaults: true,
+  removeAdditional: 'all',
+  allowUnionTypes: true,
+  allErrors: true,
+  keywords: [splitter],
+});
+addFormats(ajvInstance);
+addKeywords(ajvInstance);
+
+const createConfig = <T>(props: ConfigProperties<T>, ajv?: Ajv): T => {
+  if (ajv) ajvInstance = ajv;
+  const { schema, input } = props;
+  const inputCopy = JSON.parse(JSON.stringify(input));
   if (!schema || !input) {
-    throw new Error('schema and input is required')
+    throw new Error('schema and input is required');
   }
-  let ajvInstance = ajv
-  if (!ajvInstance) {
-    ajvInstance = new Ajv({
-      coerceTypes: true,
-      useDefaults: true,
-    })
-    addFormats(ajvInstance)
-  }
+
   const validate = ajvInstance.compile(schema);
-  console.log(validate(input))
-  if (validate(input)) {
-    return input
+  if (validate(inputCopy)) {
+    return inputCopy;
   } else {
-    throw new Error(JSON.stringify(validate.errors))
+    throw new Error(JSON.stringify(validate.errors));
   }
-}
+};
 
 interface ConfigProperties<T> {
-  schema: JSONSchemaType<T>
-  input: any
+  schema: JSONSchemaType<T>;
+  input: { [key: string]: any };
 }
 
-export { createConfig };
+export { createConfig, ConfigProperties, ajvInstance as AjvInstance };
