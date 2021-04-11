@@ -25,7 +25,7 @@ const schema: JSONSchemaType<Config> = {
       format: 'hostname',
     },
     DB_PORT: {
-      type: 'integer',
+      type: 'string',
     },
     DB_NAME: {
       type: 'string',
@@ -55,5 +55,9 @@ const schema: JSONSchemaType<Config> = {
   required: ['DB_HOST', 'DB_PORT', 'DB_NAME', 'API_URL', 'STRINGS'],
 };
 
-const config: Config = createConfig({ input: process.env, schema });
-console.log(config);
+try {
+  const config: Config = createConfig({ input: process.env, schema });
+  console.log(config);
+} catch (err) {
+  console.log(err);
+}

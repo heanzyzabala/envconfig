@@ -7,7 +7,7 @@ const splitter: FuncKeywordDefinition = {
   type: 'string',
   modifying: true,
   valid: true,
-  errors: false,
+  errors: true,
   // @ts-ignore
   compile: (schema) => (data, dataPath, parentData, parentDataProperty) => {
     if (parentData && parentDataProperty) {
@@ -42,7 +42,7 @@ const createConfig = <T>(props: ConfigProperties<T>, ajv?: Ajv): T => {
   if (validate(inputCopy)) {
     return inputCopy;
   } else {
-    throw new Error(JSON.stringify(validate.errors));
+    throw new Error(JSON.stringify(validate.errors))
   }
 };
 
@@ -51,4 +51,8 @@ interface ConfigProperties<T> {
   input: { [key: string]: any };
 }
 
-export { createConfig, ConfigProperties, ajvInstance as AjvInstance };
+export {
+  createConfig,
+  ConfigProperties,
+  ajvInstance as AjvInstance,
+};
