@@ -19,7 +19,7 @@ const splitter: FuncKeywordDefinition = {
   },
 };
 
-let ajvInstance = new Ajv({
+let AjvInstance = new Ajv({
   coerceTypes: true,
   useDefaults: true,
   removeAdditional: 'all',
@@ -27,18 +27,18 @@ let ajvInstance = new Ajv({
   allErrors: true,
   keywords: [splitter],
 });
-addFormats(ajvInstance);
-addKeywords(ajvInstance);
+addFormats(AjvInstance);
+addKeywords(AjvInstance);
 
 const createConfig = <T>(props: ConfigProperties<T>, ajv?: Ajv): T => {
-  if (ajv) ajvInstance = ajv;
+  if (ajv) AjvInstance = ajv;
   const { schema, input } = props;
   const inputCopy = JSON.parse(JSON.stringify(input));
   if (!schema || !input) {
     throw new Error('schema and input is required');
   }
 
-  const validate = ajvInstance.compile(schema);
+  const validate = AjvInstance.compile(schema);
   if (validate(inputCopy)) {
     return inputCopy;
   } else {
@@ -54,5 +54,5 @@ interface ConfigProperties<T> {
 export {
   createConfig,
   ConfigProperties,
-  ajvInstance as AjvInstance,
+  AjvInstance,
 };

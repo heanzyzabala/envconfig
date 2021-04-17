@@ -66,7 +66,7 @@ const ajvInstance = new Ajv();
 const config: Config = createConfig({ input: process.env, schema }, ajvInstance});
 ```
 
-See [Example](https://github.com/heanzyzabala/envconfig/blob/master/src/example.ts) for some samples.
+See [Examples](https://github.com/heanzyzabala/envconfig/blob/master/src/example.ts)
 
 ## Custom Keywords
 ### `splitter`
